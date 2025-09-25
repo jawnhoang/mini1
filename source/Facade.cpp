@@ -5,6 +5,12 @@
 
 using namespace std;
 
+/**
+ * Encapsulates calls to CsvReader to read and store CSV
+ * 
+ * Args: rootDir, num_threads
+ * 
+ */
 vector<vector<string>> Facade::readCsv(const string& roodDir, int num_threads) {
     //get filepaths of ALL csvs in specified directory
     CsvParser csvParser;
@@ -22,4 +28,9 @@ vector<vector<string>> Facade::readCsv(const string& roodDir, int num_threads) {
     // csvData = csvParser.read(filePaths[1], 1);
     // cout<<csvData.size()<<endl;
     return csvData;
+}
+
+int Facade::queryData(const string& condition) {
+    
+    return 0;
 }
