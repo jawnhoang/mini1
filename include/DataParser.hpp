@@ -11,6 +11,7 @@ using namespace std;
 class DataParser{
     public:
         virtual ~DataParser() = default;
-        virtual vector<vector<string>> read(const string& filepath) = 0;
+        virtual vector<vector<string>> read(const string& filepath, int num_threads) = 0;
+        virtual vector<string> getFilePaths(const string& rootDir) = 0;
 };
 

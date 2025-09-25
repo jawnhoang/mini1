@@ -9,5 +9,5 @@ using namespace std;
 
 class Facade {
     public:
-        vector<vector<string>> readCsv(const string& filePath);
+        vector<vector<string>> readCsv(const string& roodDir, int num_threads);
 };
