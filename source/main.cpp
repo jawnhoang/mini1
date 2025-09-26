@@ -1,13 +1,18 @@
 #include "../include/Facade.hpp"
 #include <iostream>
 #include <filesystem>
+#include <unordered_map>
+#include <unordered_set>
+#include <tuple>
 
 using namespace std;
 
-int main() {
+int main(int argc, char** argv) {
+    // allow passing a single CSV file or a directory; default to fires folder
+    std::string inputPath = (argc >= 2) ? argv[1] : std::string("../datasets/fires/");
     Facade facade;
     // parse datasets/fires directory and store all csv file data in a vector with thread count of choice
-    vector<vector<string>> csvFilesData = facade.readCsv("../datasets/fires/", 1);
+    vector<vector<string>> csvFilesData = facade.readCsv(inputPath, 1);
 
     // parse datasets/world_bank directory and store all csv file data in a vector  with thread count of choice
     // TODO
@@ -39,7 +44,25 @@ int main() {
         // OZONE
         // CO
         // NO2
+    // load ONLY the path the user passed (file or dir)
+    auto q1Data = csvFilesData; // reuse the already-loaded input (file or dir)
 
+    // now run Q1 on that
+    auto stats = facade.getMissingRawAqiByParameter(q1Data, 3, 6, 7, 1);
+
+
+    //std::cout << "parameter,total,missing_raw,missing_aqi\n";
+    // Format results
+    vector<pair<string,string>> q1Results;
+    for (const auto& t : stats) {
+        string key = std::get<0>(t);
+        string val = "total=" + to_string(std::get<1>(t)) +
+                    ", missing_raw=" + to_string(std::get<2>(t)) +
+                    ", missing_aqi=" + to_string(std::get<3>(t));
+        q1Results.emplace_back(key, val);
+    }
+
+    facade.printResults(q1Results);
 
 
 
@@ -49,7 +72,7 @@ int main() {
         vector<string> columnData = {"08", "PM10"};
         string minmax = "min";
         vector<pair<string,string>> result = facade.getMaxAqiBasedOnParticulantsAndMonth(csvFilesData, columnIndx, columnData, 1);
-        facade.printResults(result);
+        //facade.printResults(result);
         // PM2.5 in Sep
         // OZONE in Aug
         // CO in Sep
