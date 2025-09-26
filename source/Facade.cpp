@@ -30,7 +30,12 @@ vector<vector<string>> Facade::readCsv(const string& roodDir, int num_threads) {
     return csvData;
 }
 
-int Facade::queryData(const string& condition) {
+
+
+int Facade::getMaxAqiBasedOnParticulants(vector<string> columnData, int num_threads){
     
-    return 0;
-}
+};
+
+int Facade::getMinAqiBasedOnParticulants(vector<string> columnData, int num_threads){
+    
+};

@@ -10,5 +10,6 @@ using namespace std;
 class Facade {
     public:
         vector<vector<string>> readCsv(const string& roodDir, int num_threads);
-        int queryData(const string& condition);
+        int getMaxAqiBasedOnParticulants(vector<string> columnData, int num_threads);
+        int getMinAqiBasedOnParticulants(vector<string> columnData, int num_threads);
 };

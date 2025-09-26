@@ -10,4 +10,5 @@ class CsvParser : public DataParser{ //concret class inherits abstract class
 
         vector<string> getFilePaths(const string& rootDir);
 
+        vector<string> getSubsetData(int index, int num_threads, vector<vector<string>>& csvData, const string& condition);
 };

@@ -27,6 +27,12 @@ int main() {
     
 
     //---------- Query BEGIN ------------
+    //Fire Index:Column Desc 
+    // 0:latitude, 1:longitude, 2:UTC, 3:Parameter, 4:Concentration, 5:Unit, 6:Raw Concentration, 7:Aqi, 8:Category, 9:Site Name, 10:Site Agency, 11: AQS ID, 12:Full AQS ID 
+
+
+    // -- SINGLE THREAD QUERIES BEGIN---------
+
     //Q1: How many cases of ## reporting have missing Raw Concentration or AQI	@Raeeka
         // PM10
         // PM2.5
@@ -55,6 +61,14 @@ int main() {
 
 
     // Q4: Top 10 countries that grew in population between 1960 - 2023 @John
+
+    // -- SINGLE THREAD QUERIES END ---------
+
+
+    // -- MULTI THREAD QUERIES BEGIN ---------
+
+
+    // -- MULTI THREAD QUERIES END   ---------
 
 
     //---------- Query END ------------
