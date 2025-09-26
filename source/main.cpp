@@ -1,4 +1,4 @@
-#include "Facade.hpp"
+#include "../include/Facade.hpp"
 #include <iostream>
 #include <filesystem>
 
@@ -44,11 +44,16 @@ int main() {
 
 
     // Q2: In the Month of #, what site yielded the BEST and WORST AQI? Note: Lower AQI = better  @John
-        // PM10
-        // PM2.5
-        // OZONE
-        // CO
-        // NO2
+        // PM10 in Aug
+        vector<int> columnIndx = {2, 3, 7};
+        vector<string> columnData = {"08", "PM10"};
+        string minmax = "min";
+        vector<pair<string,string>> result = facade.getMaxAqiBasedOnParticulantsAndMonth(csvFilesData, columnIndx, columnData, 1);
+        facade.printResults(result);
+        // PM2.5 in Sep
+        // OZONE in Aug
+        // CO in Sep
+        // NO2 in Aug
 
 
     // Q3: What country codes are in what income level? @Raeeka

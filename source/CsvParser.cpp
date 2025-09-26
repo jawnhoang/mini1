@@ -35,6 +35,9 @@ vector<vector<string>> CsvParser::read(const string& filePath, int num_threads) 
         vector<string> row;
 
         while (getline(ss, cell, ',')) {
+            if (cell.back() == '\r'){
+                cell.pop_back();
+            }
             row.push_back(cell);
         }
 
@@ -61,15 +64,3 @@ vector<string> CsvParser::getFilePaths(const string& rootDir){
     }
     return csvFilePaths;
 };
-
-vector<string> CsvParser::getSubsetData(int indexOfColumn, int num_threads, vector<vector<string>>& csvData, const string& condition) {
-    vector<vector<string>> subsetData;
-    //get all data from column into new vector
-
-    #pragma omp parallel for num_threads(num_threads)
-    for (const auto& rowData : csvData){
-        
-    }
-
-
-}
