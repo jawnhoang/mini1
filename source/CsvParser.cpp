@@ -9,6 +9,12 @@
 
 using namespace std;
 
+/**
+ * Reads csv line by line into memory
+ * Invokes num_threads threads to store data
+ * 
+ * Args: filePath, num_threads
+ */
 vector<vector<string>> CsvParser::read(const string& filePath, int num_threads) {
     ifstream file(filePath);
     string line;
@@ -29,6 +35,9 @@ vector<vector<string>> CsvParser::read(const string& filePath, int num_threads) 
         vector<string> row;
 
         while (getline(ss, cell, ',')) {
+            if (cell.back() == '\r'){
+                cell.pop_back();
+            }
             row.push_back(cell);
         }
 
@@ -41,10 +50,14 @@ vector<vector<string>> CsvParser::read(const string& filePath, int num_threads) 
 
 };
 
-
-vector<string> CsvParser::getFilePaths(const string& directoryPath){
+/**
+ * Gathers all filepaths within a root directory
+ * 
+ * Args: rootDir
+ */
+vector<string> CsvParser::getFilePaths(const string& rootDir){
     vector<string> csvFilePaths;
-    for (const auto& entry : filesystem::recursive_directory_iterator(directoryPath)) {
+    for (const auto& entry : filesystem::recursive_directory_iterator(rootDir)) {
     if (entry.is_regular_file() && entry.path().extension() == ".csv") {
         csvFilePaths.push_back(entry.path().string());
     }
