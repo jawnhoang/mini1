@@ -72,7 +72,7 @@ int main(int argc, char** argv) {
         vector<string> columnData = {"08", "PM10"};
         string minmax = "min";
         vector<pair<string,string>> result = facade.getMaxAqiBasedOnParticulantsAndMonth(csvFilesData, columnIndx, columnData, 1);
-        //facade.printResults(result);
+        facade.printResults(result);
         // PM2.5 in Sep
         // OZONE in Aug
         // CO in Sep
