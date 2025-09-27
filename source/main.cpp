@@ -4,6 +4,7 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <tuple>
+#include <chrono>
 
 using namespace std;
 
@@ -68,14 +69,35 @@ int main(int argc, char** argv) {
 
     // Q2: In the Month of #, what site yielded the BEST and WORST AQI? Note: Lower AQI = better  @John
         // PM10 in Aug
-        vector<int> columnIndx = {2, 3, 7};
+        auto start = chrono::high_resolution_clock::now();
+        vector<int> columnIndx = {2, 3, 7}; // utc, param, aqi
         vector<string> columnData = {"08", "PM10"};
-        vector<pair<string,string>> result = facade.getMaxAqiBasedOnParticulantsAndMonth(csvFilesData, columnIndx, columnData, 1);
-        facade.printResults(result, 10);
+        cout<< "\nTop 10 Sites with the BEST PM10 AQI readings in August: "<< endl;
+        vector<pair<string,string>> PM10 = facade.getMaxAqiBasedOnParticulantsAndMonth(csvFilesData, columnIndx, columnData, 1);
+        facade.printResults(PM10, 10);
+        auto stop = chrono::high_resolution_clock::now();
+        auto executionDuration = chrono::duration_cast<chrono::milliseconds>(stop-start).count();
+        cout<<"\nSingle Thread execution duration?: " << executionDuration << "ms" << endl;
         // PM2.5 in Sep
+        vector<string> columnData2 = {"08", "PM2.5"};
+        cout<< "\nTop 10 Sites with the BEST PM2.5 AQI readings in August: "<< endl;
+        vector<pair<string,string>> PM25 = facade.getMaxAqiBasedOnParticulantsAndMonth(csvFilesData, columnIndx, columnData2, 1);
+        facade.printResults(PM25, 10);
         // OZONE in Aug
+        vector<string> columnData3 = {"08", "OZONE"};
+        cout<< "\nTop 10 Sites with the BEST OZONE AQI readings in August: "<< endl;
+        vector<pair<string,string>> OZONE = facade.getMaxAqiBasedOnParticulantsAndMonth(csvFilesData, columnIndx, columnData3, 1);
+        facade.printResults(OZONE, 10);
         // CO in Sep
+        vector<string> columnData4 = {"08", "CO"};
+        cout<< "\nTop 10 Sites with the BEST CO AQI readings in August: "<< endl;
+        vector<pair<string,string>> CO = facade.getMaxAqiBasedOnParticulantsAndMonth(csvFilesData, columnIndx, columnData4, 1);
+        facade.printResults(CO, 10);
         // NO2 in Aug
+        vector<string> columnData5 = {"08", "NO2"};
+        cout<< "\nTop 10 Sites with the BEST NO2 AQI readings in August: "<< endl;
+        vector<pair<string,string>> NO2 = facade.getMaxAqiBasedOnParticulantsAndMonth(csvFilesData, columnIndx, columnData5, 1);
+        facade.printResults(NO2, 10);
 
 
     // Q3: What country codes are in what income level? @Raeeka

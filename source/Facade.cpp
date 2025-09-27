@@ -2,6 +2,7 @@
 #include "CsvParser.hpp"
 #include <iomanip>
 #include <algorithm>
+#include <set>
 
 using namespace std;
 
@@ -104,6 +105,9 @@ vector<pair<string,string>> Facade::getMaxAqiBasedOnParticulantsAndMonth(vector<
         #pragma omp critical
         sites.insert(sites.end(), individualThreadStorage2.begin(), individualThreadStorage2.end());
 
+        set<pair<string,string>> uniqueSites(sites.begin(), sites.end());
+        sites.assign(uniqueSites.begin(), uniqueSites.end());
+
     }
 
     return sites;
@@ -115,17 +119,21 @@ vector<pair<string,string>> Facade::getMaxAqiBasedOnParticulantsAndMonth(vector<
 // };
 
 
-void Facade::printResults(vector<pair<string,string>>& results, int sortRange = -1){
-    cout<< results.size();
+void Facade::printResults(vector<pair<string,string>>& results, int sortRange){
+    // cout<< results.size();
     if(sortRange > 0){
         sort(results.begin(), results.end(),
             [](const auto& first, const auto& last){
                 return first.first < last.first;
             });
-    }
-
-    for(const auto& e : results){   
-        cout << left  << setw(20) << ("Site: " + e.second) << right << setw(30) << "AQI: " << e.first << endl;
+            int range = min(sortRange, (int)results.size());
+                for(int i = 0; i < range; ++i){   
+            cout << left  << setw(20) << ("Site: " + results[i].second) << right << setw(30) << "AQI: " << results[i].first << endl;
+        }
+    }else{
+        for(const auto& e : results){
+             cout << left  << setw(20) << ("Site: " + e.second) << right << setw(30) << "AQI: " << e.first << endl;
+        }
     }
 };
 
