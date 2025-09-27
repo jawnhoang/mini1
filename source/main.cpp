@@ -47,9 +47,8 @@ int main() {
         // PM10 in Aug
         vector<int> columnIndx = {2, 3, 7};
         vector<string> columnData = {"08", "PM10"};
-        string minmax = "min";
         vector<pair<string,string>> result = facade.getMaxAqiBasedOnParticulantsAndMonth(csvFilesData, columnIndx, columnData, 1);
-        facade.printResults(result);
+        facade.printResults(result, 10);
         // PM2.5 in Sep
         // OZONE in Aug
         // CO in Sep

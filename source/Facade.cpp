@@ -2,6 +2,7 @@
 #include "Facade.hpp"
 #include "CsvParser.hpp"
 #include <iomanip>
+#include <algorithm>
 
 using namespace std;
 
@@ -56,9 +57,9 @@ vector<pair<string,string>> Facade::getMaxAqiBasedOnParticulantsAndMonth(vector<
         }
         //join threads
         #pragma omp critical
-        cout << "storing" << endl;
+        // cout << "storing" << endl;
         aqiData.insert(aqiData.end(), individualThreadStorage.begin(), individualThreadStorage.end());
-        cout<< aqiData.size() <<endl;
+        // cout<< aqiData.size() <<endl;
         individualThreadStorage.clear();
 
         vector<pair<string,string>> individualThreadStorage2; //redeclare local storage but only as a 1D array
@@ -94,9 +95,16 @@ vector<pair<string,string>> Facade::getMaxAqiBasedOnParticulantsAndMonth(vector<
 // };
 
 
-void Facade::printResults(vector<pair<string,string>>& results){
+void Facade::printResults(vector<pair<string,string>>& results, int sortRange = -1){
     cout<< results.size();
-    for(const auto& e : results){
+    if(sortRange > 0){
+        sort(results.begin(), results.end(),
+            [](const auto& first, const auto& last){
+                return first.first < last.first;
+            });
+    }
+
+    for(const auto& e : results){   
         cout << left  << setw(20) << ("Site: " + e.second) << right << setw(30) << "AQI: " << e.first << endl;
     }
 };
