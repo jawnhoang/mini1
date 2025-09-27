@@ -3,7 +3,10 @@
 #include <fstream>
 #include <sstream>
 #include <vector>
-#include <omp.h>
+#include <filesystem>
+#ifdef _OPENMP
+  #include <omp.h>
+#endif
 #include <utility>
 
 
@@ -57,7 +60,7 @@ vector<vector<string>> CsvParser::read(const string& filePath, int num_threads) 
  */
 vector<string> CsvParser::getFilePaths(const string& rootDir){
     vector<string> csvFilePaths;
-    for (const auto& entry : filesystem::recursive_directory_iterator(rootDir)) {
+    for (const auto& entry : std::filesystem::recursive_directory_iterator(rootDir)) {
     if (entry.is_regular_file() && entry.path().extension() == ".csv") {
         csvFilePaths.push_back(entry.path().string());
     }

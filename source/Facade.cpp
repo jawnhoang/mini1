@@ -1,4 +1,3 @@
-
 #include "Facade.hpp"
 #include "CsvParser.hpp"
 #include <iomanip>
@@ -13,9 +12,30 @@ using namespace std;
  * 
  */
 vector<vector<string>> Facade::readCsv(const string& roodDir, int num_threads) {
+    // Heuristic: if the path ends with .csv (case-insensitive), treat as single file
+    if (roodDir.size() >= 4) {
+        auto ends_with_icase = [](const std::string& s, const char* suf){
+            size_t n = std::strlen(suf);
+            if (s.size() < n) return false;
+            for (size_t i = 0; i < n; ++i) {
+                char a = std::tolower(static_cast<unsigned char>(s[s.size()-n+i]));
+                char b = std::tolower(static_cast<unsigned char>(suf[i]));
+                if (a != b) return false;
+            }
+            return true;
+        };
+        if (ends_with_icase(roodDir, ".csv")) {
+            CsvParser csvParserSingleBySuffix;
+            auto rows = csvParserSingleBySuffix.read(roodDir, num_threads);
+            // Optional: small debug line; keep for now, easy to remove later
+            std::cerr << "[Facade] Single-file mode by suffix: " << roodDir << " (rows=" << rows.size() << ")\n";
+            return rows;
+        }
+    }
     //get filepaths of ALL csvs in specified directory
     CsvParser csvParser;
     vector<string> filePaths = csvParser.getFilePaths(roodDir);
+    std::cerr << "[Facade] Directory mode: found " << filePaths.size() << " CSV files under " << roodDir << "\n";
     // cout << filePaths.size() << endl;
 
     //read
@@ -108,3 +128,74 @@ void Facade::printResults(vector<pair<string,string>>& results, int sortRange = 
         cout << left  << setw(20) << ("Site: " + e.second) << right << setw(30) << "AQI: " << e.first << endl;
     }
 };
+
+std::vector<std::tuple<std::string, size_t, size_t, size_t>>
+Facade::getMissingRawAqiByParameter(std::vector<std::vector<std::string>>& dataset,
+                                     int paramCol, int rawCol, int aqiCol, int num_threads) {
+    // fixed parameter order for output
+    const std::string params[5] = {"PM10","PM2.5","OZONE","CO","NO2"};
+    auto idx_of = [&](const std::string& p)->int{
+        for (int i=0;i<5;++i) if (dataset.size()>0 && p == params[i]) return i;
+        for (int i=0;i<5;++i) if (p == params[i]) return i; // fallback
+        return -1;
+    };
+
+    // counts[5] = {total, missing_raw, missing_aqi}
+    std::vector<std::array<size_t,3>> counts(5, {0,0,0});
+
+    // helper: strip surrounding quotes ("...") if present
+    auto dequote = [](const std::string& s) -> std::string {
+        if (s.size() >= 2 && s.front()=='"' && s.back()=='"')
+            return s.substr(1, s.size()-2);
+        return s;
+    };
+
+    auto trim_copy = [](std::string s){
+        auto issp = [](unsigned char c){ return std::isspace(c); };
+        s.erase(s.begin(), std::find_if(s.begin(), s.end(), [&](unsigned char c){ return !issp(c); }));
+        s.erase(std::find_if(s.rbegin(), s.rend(), [&](unsigned char c){ return !issp(c); }).base(), s.end());
+        return s;
+    };
+    auto is_missing = [&](const std::string& s0){
+        std::string s = trim_copy(s0);
+        if (s.empty()) return true;
+        std::string u; u.reserve(s.size());
+        for (unsigned char c: s) u.push_back(std::toupper(c));
+        if (u=="NA"||u=="N/A"||u=="NULL"||u=="NAN"||u==".") return true;
+        if (s.rfind("-999",0)==0 || s.rfind("-9999",0)==0) return true;
+        return false;
+    };
+
+    #pragma omp parallel num_threads(num_threads)
+    {
+        std::array<size_t,3> local[5];
+        for (int i=0;i<5;++i) local[i] = {0,0,0};
+
+        #pragma omp for
+        for (int r = 0; r < (int)dataset.size(); ++r) {
+            const auto& row = dataset[r];
+            if ((int)row.size() <= aqiCol) continue;
+            const std::string pnorm = trim_copy(dequote(row[paramCol]));
+            int k = idx_of(pnorm);
+            if (k < 0) continue; // ignore other parameters
+            local[k][0]++;
+            if (is_missing(dequote(row[rawCol]))) local[k][1]++;
+            if (is_missing(dequote(row[aqiCol]))) local[k][2]++;
+        }
+
+        #pragma omp critical
+        {
+            for (int i=0;i<5;++i) {
+                counts[i][0] += local[i][0];
+                counts[i][1] += local[i][1];
+                counts[i][2] += local[i][2];
+            }
+        }
+    }
+
+    std::vector<std::tuple<std::string,size_t,size_t,size_t>> out; out.reserve(5);
+    for (int i=0;i<5;++i) {
+        out.emplace_back(params[i], counts[i][0], counts[i][1], counts[i][2]);
+    }
+    return out;
+}
