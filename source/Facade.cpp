@@ -1,6 +1,7 @@
 #include "Facade.hpp"
 #include "CsvParser.hpp"
 #include "Stopwatch.hpp"
+#include "WorldDataParser.hpp"
 #include <iomanip>
 #include <algorithm>
 #include <set>
@@ -221,4 +222,9 @@ void Facade::stopTimer(){
 
 void Facade::printTimeSummary(string& msg){
     timer.printTimeSummary(msg);
+}
+
+void Facade::getAvgPop(vector<vector<string>>& csvData, vector<int>& columnIdx, int& rowStart,int num_threads){
+    wdParser.calculateAvgPop1930_1968(csvData, columnIdx, rowStart, num_threads);
+    wdParser.printAvgPopSummary();
 }

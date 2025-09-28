@@ -25,7 +25,7 @@ SET( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ${OPENMP_CXX_FLAGS}" )
 # app targets
 include_directories(include)
 
-add_executable(main source/main.cpp source/Facade.cpp source/CsvParser.cpp source/Stopwatch.cpp)
+add_executable(main source/main.cpp source/Facade.cpp source/CsvParser.cpp source/Stopwatch.cpp source/WorldDataParser.cpp)
 
 
 
