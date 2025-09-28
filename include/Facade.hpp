@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <unordered_map>
+#include <Stopwatch.hpp>
 
 using namespace std;
 
@@ -13,6 +14,8 @@ class Facade {
         size_t missing_raw = 0;
         size_t missing_aqi = 0;
     };
+    private:
+        Stopwatch timer;
 
     public:
         vector<vector<string>> readCsv(const string& roodDir, int num_threads);
@@ -23,6 +26,9 @@ class Facade {
                                     int paramCol, int rawCol, int aqiCol, int num_threads);
 
         void printResults(vector<pair<string,string>>& results, int sortRange = -1);
+        void startTimer();
+        void stopTimer();
+        void printTimeSummary(string& msg);
 
     
 };

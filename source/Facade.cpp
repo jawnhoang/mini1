@@ -1,5 +1,6 @@
 #include "Facade.hpp"
 #include "CsvParser.hpp"
+#include "Stopwatch.hpp"
 #include <iomanip>
 #include <algorithm>
 #include <set>
@@ -206,4 +207,18 @@ Facade::getMissingRawAqiByParameter(std::vector<std::vector<std::string>>& datas
         out.emplace_back(params[i], counts[i][0], counts[i][1], counts[i][2]);
     }
     return out;
+}
+
+
+void Facade::startTimer(){
+    timer.startTimer();
+}
+
+void Facade::stopTimer(){
+    timer.stopTimer();
+
+}
+
+void Facade::printTimeSummary(string& msg){
+    timer.printTimeSummary(msg);
 }
