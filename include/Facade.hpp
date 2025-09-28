@@ -5,6 +5,7 @@
 #include <vector>
 #include <unordered_map>
 #include <Stopwatch.hpp>
+#include <WorldDataParser.hpp>
 
 using namespace std;
 
@@ -16,6 +17,7 @@ class Facade {
     };
     private:
         Stopwatch timer;
+        WorldDataParser wdParser;
 
     public:
         vector<vector<string>> readCsv(const string& roodDir, int num_threads);
@@ -30,5 +32,6 @@ class Facade {
         void stopTimer();
         void printTimeSummary(string& msg);
 
+        void getAvgPop(vector<vector<string>>& csvData, vector<int>& columnIdx, int& rowStart,int num_threads);
     
 };
