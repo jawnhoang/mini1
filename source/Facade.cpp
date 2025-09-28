@@ -1,6 +1,9 @@
 #include "Facade.hpp"
 #include "CsvParser.hpp"
+#include "Stopwatch.hpp"
 #include <iomanip>
+#include <algorithm>
+#include <set>
 
 using namespace std;
 
@@ -76,9 +79,9 @@ vector<pair<string,string>> Facade::getMaxAqiBasedOnParticulantsAndMonth(vector<
         }
         //join threads
         #pragma omp critical
-        cout << "storing" << endl;
+        // cout << "storing" << endl;
         aqiData.insert(aqiData.end(), individualThreadStorage.begin(), individualThreadStorage.end());
-        cout<< aqiData.size() <<endl;
+        // cout<< aqiData.size() <<endl;
         individualThreadStorage.clear();
 
         vector<pair<string,string>> individualThreadStorage2; //redeclare local storage but only as a 1D array
@@ -103,6 +106,9 @@ vector<pair<string,string>> Facade::getMaxAqiBasedOnParticulantsAndMonth(vector<
         #pragma omp critical
         sites.insert(sites.end(), individualThreadStorage2.begin(), individualThreadStorage2.end());
 
+        set<pair<string,string>> uniqueSites(sites.begin(), sites.end());
+        sites.assign(uniqueSites.begin(), uniqueSites.end());
+
     }
 
     return sites;
@@ -114,10 +120,21 @@ vector<pair<string,string>> Facade::getMaxAqiBasedOnParticulantsAndMonth(vector<
 // };
 
 
-void Facade::printResults(vector<pair<string,string>>& results){
-    cout<< results.size();
-    for(const auto& e : results){
-        cout << left  << setw(20) << ("Site: " + e.second) << right << setw(30) << "AQI: " << e.first << endl;
+void Facade::printResults(vector<pair<string,string>>& results, int sortRange){
+    // cout<< results.size();
+    if(sortRange > 0){
+        sort(results.begin(), results.end(),
+            [](const auto& first, const auto& last){
+                return first.first < last.first;
+            });
+            int range = min(sortRange, (int)results.size());
+                for(int i = 0; i < range; ++i){   
+            cout << left  << setw(20) << ("Site: " + results[i].second) << right << setw(30) << "AQI: " << results[i].first << endl;
+        }
+    }else{
+        for(const auto& e : results){
+             cout << left  << setw(20) << ("Site: " + e.second) << right << setw(30) << "AQI: " << e.first << endl;
+        }
     }
 };
 
@@ -190,4 +207,18 @@ Facade::getMissingRawAqiByParameter(std::vector<std::vector<std::string>>& datas
         out.emplace_back(params[i], counts[i][0], counts[i][1], counts[i][2]);
     }
     return out;
+}
+
+
+void Facade::startTimer(){
+    timer.startTimer();
+}
+
+void Facade::stopTimer(){
+    timer.stopTimer();
+
+}
+
+void Facade::printTimeSummary(string& msg){
+    timer.printTimeSummary(msg);
 }

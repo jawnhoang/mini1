@@ -4,6 +4,7 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <tuple>
+#include <chrono>
 
 using namespace std;
 
@@ -67,17 +68,59 @@ int main(int argc, char** argv) {
 
 
     // Q2: In the Month of #, what site yielded the BEST and WORST AQI? Note: Lower AQI = better  @John
+        Facade querySpecific;
+        querySpecific.startTimer();
         // PM10 in Aug
-        vector<int> columnIndx = {2, 3, 7};
+        facade.startTimer();
+        vector<int> columnIndx = {2, 3, 7}; // utc, param, aqi
         vector<string> columnData = {"08", "PM10"};
-        string minmax = "min";
-        vector<pair<string,string>> result = facade.getMaxAqiBasedOnParticulantsAndMonth(csvFilesData, columnIndx, columnData, 1);
-        facade.printResults(result);
+        cout<< "\nTop 10 Sites with the BEST PM10 AQI readings in August: "<< endl;
+        vector<pair<string,string>> PM10 = facade.getMaxAqiBasedOnParticulantsAndMonth(csvFilesData, columnIndx, columnData, 1);
+        facade.printResults(PM10, 10);
+        facade.stopTimer();
+        string msg1 = "Single Thread execution duration";
+        facade.printTimeSummary(msg1);
         // PM2.5 in Sep
-        // OZONE in Aug
-        // CO in Sep
-        // NO2 in Aug
+        facade.startTimer();
+        vector<string> columnData2 = {"08", "PM2.5"};
+        cout<< "\nTop 10 Sites with the BEST PM2.5 AQI readings in August: "<< endl;
+        vector<pair<string,string>> PM25 = facade.getMaxAqiBasedOnParticulantsAndMonth(csvFilesData, columnIndx, columnData2, 1);
+        facade.printResults(PM25, 10);
+        facade.stopTimer();
+        string msg2 = "Single Thread execution duration";
+        facade.printTimeSummary(msg2);
 
+        // OZONE in Aug
+        facade.startTimer();
+        vector<string> columnData3 = {"08", "OZONE"};
+        cout<< "\nTop 10 Sites with the BEST OZONE AQI readings in August: "<< endl;
+        vector<pair<string,string>> OZONE = facade.getMaxAqiBasedOnParticulantsAndMonth(csvFilesData, columnIndx, columnData3, 1);
+        facade.printResults(OZONE, 10);
+        facade.stopTimer();
+        string msg3 = "Single Thread execution duration";
+        facade.printTimeSummary(msg3);
+        // CO in Sep
+        facade.startTimer();
+        vector<string> columnData4 = {"08", "CO"};
+        cout<< "\nTop 10 Sites with the BEST CO AQI readings in August: "<< endl;
+        vector<pair<string,string>> CO = facade.getMaxAqiBasedOnParticulantsAndMonth(csvFilesData, columnIndx, columnData4, 1);
+        facade.printResults(CO, 10);
+        facade.stopTimer();
+        string msg4 = "Single Thread execution duration";
+        facade.printTimeSummary(msg4);
+        // NO2 in Aug
+        facade.startTimer();
+        vector<string> columnData5 = {"08", "NO2"};
+        cout<< "\nTop 10 Sites with the BEST NO2 AQI readings in August: "<< endl;
+        vector<pair<string,string>> NO2 = facade.getMaxAqiBasedOnParticulantsAndMonth(csvFilesData, columnIndx, columnData5, 1);
+        facade.printResults(NO2, 10);
+        facade.stopTimer();
+        string msg5 = "Single Thread execution duration";
+        facade.printTimeSummary(msg5);
+
+        querySpecific.stopTimer();
+        string msg6 = "Overall Query execution:";
+        querySpecific.printTimeSummary(msg6);
 
     // Q3: What country codes are in what income level? @Raeeka
         // Low
