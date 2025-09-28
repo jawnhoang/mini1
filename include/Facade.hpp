@@ -1,4 +1,3 @@
-
 #pragma once
 
 #include <string>
@@ -33,5 +32,12 @@ class Facade {
         void printTimeSummary(string& msg);
 
         void getAvgPop(vector<vector<string>>& csvData, vector<int>& columnIdx, int& rowStart,int num_threads);
+    
+        // Q3: World Bank — group ISO3 country codes by income level (header-driven)
+        std::vector<std::pair<std::string,std::string>>
+        getWorldBankIncomeGroupsByHeader(std::vector<std::vector<std::string>>& wbData,
+                                         const std::vector<std::string>& codeHeaderNames,
+                                         const std::vector<std::string>& groupHeaderNames,
+                                         int num_threads);
     
 };

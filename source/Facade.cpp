@@ -228,3 +228,13 @@ void Facade::getAvgPop(vector<vector<string>>& csvData, vector<int>& columnIdx, 
     wdParser.calculateAvgPop1930_1968(csvData, columnIdx, rowStart, num_threads);
     wdParser.printAvgPopSummary();
 }
+
+// Q3 wrapper: forward to WorldDataParser (header-driven)
+std::vector<std::pair<std::string,std::string>>
+Facade::getWorldBankIncomeGroupsByHeader(std::vector<std::vector<std::string>>& wbData,
+                                         const std::vector<std::string>& codeHeaderNames,
+                                         const std::vector<std::string>& groupHeaderNames,
+                                         int /*num_threads*/) {
+    WorldDataParser wdp;
+    return wdp.incomeGroupsByHeader(wbData, codeHeaderNames, groupHeaderNames);
+}

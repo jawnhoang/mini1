@@ -1,4 +1,3 @@
-
 #include "CsvParser.hpp"
 #include <fstream>
 #include <sstream>
@@ -42,6 +41,17 @@ vector<vector<string>> CsvParser::read(const string& filePath, int num_threads) 
                 cell.pop_back();
             }
             row.push_back(cell);
+        }
+
+        // Strip UTF-8 BOM from the very first cell of the first row, if present
+        if (i == 0 && !row.empty()) {
+            const unsigned char BOM0 = 0xEF, BOM1 = 0xBB, BOM2 = 0xBF;
+            if (row[0].size() >= 3 &&
+                (unsigned char)row[0][0] == BOM0 &&
+                (unsigned char)row[0][1] == BOM1 &&
+                (unsigned char)row[0][2] == BOM2) {
+                row[0].erase(0, 3);
+            }
         }
 
         data[i] = std::move(row);

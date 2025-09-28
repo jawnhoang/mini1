@@ -54,7 +54,6 @@ int main(int argc, char** argv) {
     // now run Q1 on that
     auto stats = facade.getMissingRawAqiByParameter(q1Data, 3, 6, 7, 1);
 
-
     //std::cout << "parameter,total,missing_raw,missing_aqi\n";
     // Format results
     vector<pair<string,string>> q1Results;
@@ -65,7 +64,6 @@ int main(int argc, char** argv) {
                     ", missing_aqi=" + to_string(std::get<3>(t));
         q1Results.emplace_back(key, val);
     }
-
     facade.printResults(q1Results);
 
 
@@ -131,8 +129,37 @@ int main(int argc, char** argv) {
         // Upper
         // lower
         // high
+    // --- Q3 BEGIN (WB metadata-driven; minimal main, logic in Facade) ---
+    // Use a separate metadata COUNTRY file for income groups (do NOT reuse the population CSV used by Q4)
+    // Allow passing it as argv[2]; otherwise default to the expected metadata filename.
+    std::string wbMetaPath = (argc >= 3)
+        ? std::string(argv[2])
+        : std::string("../datasets/world_bank/Metadata_Country_API_SP.POP.TOTL_DS2_en_csv_v2_3401680.csv");
 
+    // Reuse the same facade instance for WB work
+    auto wbMetaData = facade2.readCsv(wbMetaPath, 1);
 
+    // We will implement this Facade method next; keeping main tiny and pattern-consistent.
+    // Header names are provided here so the code is generic for future datasets.
+    vector<string> codeHeaders  = {"Country Code","CountryCode","ISO3 Code","Country ISO3 Code","Code"};
+    vector<string> groupHeaders = {"IncomeGroup","Income Group","Income Level","IncomeLevel"};
+
+    auto wbGroups = facade2.getWorldBankIncomeGroupsByHeader(wbMetaData, codeHeaders, groupHeaders, 1);
+   
+   
+    //facade2.printResults(wbGroups);
+    // Pretty print with group counts and wrapped lines
+    std::cout << "\n[WB-Q3] ISO3 codes by income level\n---------------------------------\n";
+    for (const auto& kv : wbGroups) {
+        const std::string& label = kv.first;
+        const std::string& codes = kv.second; // already wrapped above
+        // count items = commas + 1 (if non-empty)
+        std::size_t count = 0; for (char ch : codes) if (ch == ',') ++count; if (!codes.empty()) ++count;
+        std::cout << label << " (" << count << "):\n" << codes << "\n\n";
+    }
+    // --- Q3 END ---
+
+/*
 
     // Q4: Top 10 countries that grew in population between 1960 - 2023 @John
     //start from row 5 for start of data
@@ -145,6 +172,8 @@ int main(int argc, char** argv) {
     string wbMsg = "\nSingle Thread execution: ";
     facade2.printTimeSummary(wbMsg);
 
+
+*/
     // -- SINGLE THREAD QUERIES END ---------
 
 
