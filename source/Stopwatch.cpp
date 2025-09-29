@@ -15,6 +15,11 @@ void Stopwatch::stopTimer(){
 
 void Stopwatch::printTimeSummary(string& msg){
     auto executionDuration = chrono::duration_cast<chrono::milliseconds>(stop-start).count();
-    cout<< msg<< ": " << executionDuration << "ms" << endl;
+    if(executionDuration < 2){
+        auto executionDurationNS = chrono::duration_cast<chrono::nanoseconds>(stop-start).count();
+        cout<< msg<< ": " << executionDurationNS << "ns" << endl;
+    }else{
+        cout<< msg<< ": " << executionDuration << "ms" << endl;
+    }
     cout<<"------------------" << endl;
 }
