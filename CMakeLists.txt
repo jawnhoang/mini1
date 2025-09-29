@@ -2,6 +2,16 @@ cmake_minimum_required(VERSION 4.0)
 
 project (hello)
 set(CMAKE_CXX_STANDARD 17)
+
+# Prefer Homebrew LLVM if available (so OpenMP works on macOS)
+if (EXISTS "/usr/local/opt/llvm/bin/clang")
+  set(CMAKE_C_COMPILER "/usr/local/opt/llvm/bin/clang")
+  set(CMAKE_CXX_COMPILER "/usr/local/opt/llvm/bin/clang++")
+elseif (EXISTS "/opt/homebrew/opt/llvm/bin/clang")
+  set(CMAKE_C_COMPILER "/opt/homebrew/opt/llvm/bin/clang")
+  set(CMAKE_CXX_COMPILER "/opt/homebrew/opt/llvm/bin/clang++")
+endif()
+
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # compilers to use (9.2)
@@ -24,10 +34,6 @@ set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/Modules)
 SET(OPENMP_CXX_FLAGS "") # blank flag for now
 SET( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ${OPENMP_CXX_FLAGS}" )
 
-find_package(OpenMP)
-if (OpenMP_CXX_FOUND)
-  target_link_libraries(main PRIVATE OpenMP::OpenMP_CXX)
-endif()
 
 # app targets
 include_directories(include)
@@ -35,6 +41,8 @@ include_directories(include)
 #add_executable(main source/main.cpp source/Facade.cpp source/CsvParser.cpp)
 add_executable(main source/main.cpp source/Facade.cpp source/CsvParser.cpp source/Stopwatch.cpp source/WorldDataParser.cpp)
 
-
-
-
+# Link OpenMP after the target is defined (fixes: target not built by this project)
+find_package(OpenMP)
+if (OpenMP_CXX_FOUND)
+  target_link_libraries(main PRIVATE OpenMP::OpenMP_CXX)
+endif()
