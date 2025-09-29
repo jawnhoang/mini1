@@ -60,7 +60,7 @@ vector<pair<string,string>> Facade::getMaxAqiBasedOnParticulantsAndMonth(vector<
     vector<vector<string>> aqiData;
     vector<pair<string,string>> sites;
 
-    //iterate through data based on column index and take row that matches columnData conditions into consideration to crunch data
+    //iterate through rows of data based on column index and take row that matches columnData conditions into consideration to crunch data
     #pragma omp parallel num_threads(num_threads) // establishes how many threads will run this section
     {
         vector<vector<string>> individualThreadStorage; //give a thread it's own storage to avoid race conditions
