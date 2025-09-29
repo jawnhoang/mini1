@@ -1,0 +1,633 @@
+﻿John Hoang
+Raeeka Yusuf
+
+
+
+
+Mini 1 Report
+
+
+Mini 1 goal was to read in two CSV datasets, save them to whatever data structure we chose, and apply data retrieval in the form of queries. The structure of our code begins with reading in the dataset into a 2D array utilizing vector<vector<string>>. This essentially reads in all the data within the CSV, and no data cleaning was done at this stage. Then we applied our four planned queries to the stored 2D array.
+
+
+Our four queries were: 1. How many cases of particulate(PM10, PM2.5, ozone, CO, NO2) reportings have missing Raw Concentration or AQI, 2. In August or September, what site yielded the BEST AQI, 3. What country codes are in what income level, and 4. What is the average population for all countries listed between 1960 and 2023? These queries were intended to focus implementation on parsing a 2D array using threads. The following report shows observations and findings.
+
+
+Query 1
+Query 1 asked: How many cases of particulates (PM10, PM2.5, Ozone, CO, NO2) reportings have missing Raw Concentration or AQI?
+
+
+The single-threaded implementation iterated row by row through the CSV files and tallied the missing values. Below are the sample timings:
+
+
+Single Thread execution for Q1 (missing raw/AQI): : 374ms
+--Q1 (Single-thread) per-parameter timings ---
+Q1 (Single) PM10: : 272ms
+Q1 (Single) PM2.5: : 277ms
+Q1 (Single) OZONE: : 273ms
+Q1 (Single) CO: : 272ms
+Q1 (Single) NO2: : 272ms
+
+
+When parallelized with OpenMP, the workload was divided across multiple threads, significantly reducing execution time:
+
+
+Multi Thread execution for Q1 (missing raw/AQI): : 183ms
+--Q1 (Multi-thread: 2 threads) per-parameter timings ---
+Q1 (Multi) PM10: : 140ms
+Q1 (Multi) PM2.5: : 141ms
+Q1 (Multi) OZONE: : 140ms
+Q1 (Multi) CO: : 140ms
+Q1 (Multi) NO2: : 142ms
+
+
+The improvement shows how parallelization speeds up row traversal and aggregation, particularly for larger pollutant datasets. The total runtime nearly halved with 2 threads compared to single-thread execution.
+
+
+The results below show in more detail the execution times by other varying thread counts:
+
+
+Threads = 2
+Q1 (Single-thread total): 316 ms
+  • PM10: 281 ms, PM2.5: 277 ms, OZONE: 278 ms, CO: 279 ms, NO2: 279 ms
+Q1 (Multi-thread total): 163 ms
+  • PM10: 142 ms, PM2.5: 141 ms, OZONE: 141 ms, CO: 145 ms, NO2: 142 ms
+
+
+Threads = 4
+Q1 (Single-thread total): 302 ms
+  • PM10: 280 ms, PM2.5: 279 ms, OZONE: 276 ms, CO: 279 ms, NO2: 275 ms
+Q1 (Multi-thread total): 115 ms
+  • PM10: 72 ms, PM2.5: 72 ms, OZONE: 72 ms, CO: 71 ms, NO2: 73 ms
+
+
+Threads = 6
+Q1 (Single-thread total): 284 ms
+  • PM10: 284 ms, PM2.5: 282 ms, OZONE: 278 ms, CO: 281 ms, NO2: 277 ms
+Q1 (Multi-thread total): 52 ms
+  • PM10: 49 ms, PM2.5: 51 ms, OZONE: 49 ms, CO: 50 ms, NO2: 49 ms
+  *Notes on units: Q1 timings are reported in milliseconds (ms)
+
+
+
+
+The results of the execution times for this query is summarized in the following chart:
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Query 2
+In August or September, what site yielded the BEST AQI
+
+
+With the data stored in a 2D vector, the data was parsed by Row and Column. The reason it was decided to iterate through the data structure row by row was that we already knew which columns to look for, based on the index. We wanted to extract a value within that row based on the condition of another column. We found this posting on StackExchange, which provided some insight on why traversing by row was better, which influenced the initial design. https://cs.stackexchange.com/questions/14826/performance-of-row-vs-column-wise-matrix-traversal 
+https://www.aristeia.com/TalkNotes/ACCU2011_CPUCaches.pdf
+
+
+Since each row would technically be loaded into cache, it would be possible to access the specific column data we were looking for a lot faster than having to iterate through it as well.
+
+
+First, we’d look for all CSV data that indicates it was recorded in either August or September as part of the query.
+
+
+Iterating through each row in the 2D array, it checks a specific column to know what data we are receiving, ie. PM10, PM2.5, CO, etc. Based on the condition of the query, it will examine another specific column, the AQI value. It will then store the entire row if the values pass our conditions for the search.
+
+
+Below is the result of the queries running in 1 thread. Limited search to the top 10 results.
+
+
+Top 10 Sites with the BEST PM10 AQI readings in August: 
+Site: "Blind Services; 1185-A Dunn Ave"                         AQI: "29.2069"
+Site: "Palatka"                              AQI: "29.686667"
+Site: "Mandarin"                             AQI: "30.1358"
+Site: "Kooker Park"                          AQI: "30.356111"
+Site: "Nogales Post Office"                         AQI: "31.337204"
+Site: "Douglas Red Cross"                         AQI: "31.3492"
+Site: "Paul Spur Chemical Lime Plant"                         AQI: "31.3658"
+Site: "Socorro Hueco C49"                         AQI: "31.66752"
+Site: "El Paso UTEP C12"                         AQI: "31.768056"
+Site: "Desert View"                          AQI: "31.7961"
+Single Thread execution duration: 63ms
+------------------
+
+
+Top 10 Sites with the BEST PM2.5 AQI readings in September: 
+Site: "Seminole Community College (AG COMP)"                         AQI: "28.7456"
+Site: "Crystal River Preserve"                         AQI: "28.958372"
+Site: "Von Ormy Highway 16"                         AQI: "29.162942"
+Site: "YMCA Marion County"                         AQI: "29.170799"
+Site: "Blind Services; 1185-A Dunn Ave"                         AQI: "29.2069"
+Site: "Galveston Airport C1034"                         AQI: "29.2631"
+Site: "Calaveras Lake C59"                         AQI: "29.275299"
+Site: "Big Bend  NP"                         AQI: "29.3025"
+Site: "San Antonio Old Hwy90 C677"                         AQI: "29.423933"
+Site: "San Antonio Northwest C23"                         AQI: "29.514999"
+Single Thread execution duration: 147ms
+------------------
+
+
+Top 10 Sites with the BEST OZONE AQI readings in August: 
+Site: "Seminole Community College (AG COMP)"                         AQI: "28.7456"
+Site: "Victoria C87"                         AQI: "28.8358"
+Site: "Lake Jackson C1016"                         AQI: "29.0436"
+Site: "YMCA Marion County"                         AQI: "29.170799"
+Site: "County Sheriff Impound"                         AQI: "29.1928"
+Site: "Blind Services; 1185-A Dunn Ave"                         AQI: "29.2069"
+Site: "Galveston Airport C1034"                         AQI: "29.2631"
+Site: "Calaveras Lake C59"                         AQI: "29.275299"
+Site: "Big Bend  NP"                         AQI: "29.3025"
+Site: "Flagler County"                         AQI: "29.489082"
+Single Thread execution duration: 148ms
+------------------
+
+
+Top 10 Sites with the BEST CO AQI readings in September: 
+Site: "St. Marks Wildlife Refuge"                         AQI: "30.0842"
+Site: "Pepsi Place"                          AQI: "30.262808"
+Site: "Jackson NCORE"                         AQI: "32.329042"
+Site: "SPABC14 COBACH"                         AQI: "32.6336"
+Site: "West Chandler Fire Station"                         AQI: "33.299"
+Site: "Buckeye"                              AQI: "33.37"
+Site: "South Phoenix"                         AQI: "33.4033"
+Site: "Mesa Brooks Reservoir"                         AQI: "33.4105"
+Site: "Central Phoenix"                         AQI: "33.4579"
+Site: "West Phoenix"                         AQI: "33.483799"
+Single Thread execution duration: 41ms
+------------------
+
+
+Top 10 Sites with the BEST NO2 AQI readings in August: 
+Site: "Pepsi Place"                          AQI: "30.262808"
+Site: "Kooker Park"                          AQI: "30.356111"
+Site: "PASCAGOULA"                           AQI: "30.378054"
+Site: "Santa Teresa"                         AQI: "31.7878"
+Site: "Desert View"                          AQI: "31.7961"
+Site: "Carlsbad"                             AQI: "32.38"
+Site: "SPABC14 COBACH"                         AQI: "32.6336"
+Site: "Calexico Ethel Street"                         AQI: "32.67618"
+Site: "Hobbs Jefferson"                         AQI: "32.7267"
+Site: "Jenkins Avenue"                         AQI: "32.88229"
+Single Thread execution duration: 46ms
+------------------
+Overall execution for Query 2:: 446ms
+------------------
+
+
+
+
+Running this query on a single thread a few times would result in a time range of ~400 to ~500ms
+
+
+To parallelize the code where it iterates through and gathers data, the plan was to split the rows amongst N threads so they all work on only a few rows. We used #pragma omp parallel num_threads(N) to allocate N threads to execute a block of code with however many threads decided (https://www.ibm.com/docs/en/zos/2.4.0?topic=processing-pragma-omp-parallel). At the start of the code block, N threads are created by the compiler to execute the code within the block. At the beginning of the array traversal, #pragma omp for is declared to split work amongst the N threads created. This is done internally.
+
+
+  
+  
+
+After a subset dataset has been created for data crunching, we dig through the subset to meet the query requirements using the same process of dividing rows amongst threads and have it collect the proper column data.
+  
+ We were running into issues trying to get the data to save properly, and realized race conditions were occurring due to 1. Some threads finish first and move onto the second part of the function. Using the implementation of #pragma omp barrier forces all threads created for a job to finish before moving on (https://www.ibm.com/docs/en/zos/3.1.0?topic=processing-pragma-omp-barrier) and use #pragma omp critical before any write access to limit capability to only one thread at a time to prevent more than one access (https://www.ibm.com/docs/en/zos/3.1.0?topic=processing-pragma-omp-critical).
+
+
+Also gave each thread its own local storage to use. Since each thread was responsible for writing data based on its traversal and parameters, if it wrote to the same location, higher-level synchronization methods would need to be accounted for. We didn’t want to overcomplicate what we have, so we decided to declare a local variable within the for loop so that each thread has a location to write to. Then, at the very end, once all the threads are done, we do a huge join of all thread data (https://www.codeproject.com/articles/Use-Thread-local-Storage-to-Reduce-Synchronization). 
+
+
+The query was ran and compared on a range of threads: 1 to 4. The graphics below illustrate the benchmarks across all the queries.
+  
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+We can deduce that increasing the number of threads used for processing the rows of the data structure did, in fact, increase the efficiency of the code in terms of execution time to a degree. Some vary in range more than others, and that may be because the data for these specific parameters also could contain different sizes of data.  
+
+
+Query 3
+This required parsing the World Bank dataset and categorizing countries into four income groups: Low, Lower Middle, Upper Middle, and High. Since each row contained income-level data, a row-first traversal with OpenMP was used for parallelization.
+
+
+The results below show the execution times:
+
+
+Single Thread execution for Q3 (income grouping): : 1809208ns
+--Q3 (Single-thread) per-income-group timings ---
+Q3 (Single) Low: : 25167ns
+Q3 (Single) Lower middle: : 23500ns
+Q3 (Single) Upper middle: : 23750ns
+Q3 (Single) High: : 24000ns
+
+
+Multi Thread execution for Q3 (income grouping): : 80916ns
+--Q3 (Multi-thread) per-income-group timings ---
+Q3 (Multi) Low: : 25416ns
+Q3 (Multi) Lower middle: : 34250ns
+Q3 (Multi) Upper middle: : 24834ns
+Q3 (Multi) High: : 23833ns
+
+
+Because these operations are lightweight string lookups and categorizations, even single-threaded performance was already fast. Still, moving to multithreading improved the runtime by more than an order of magnitude which can be seen in the more detail in the full results of our logs:
+
+
+The results below show the execution times by varying thread counts in more detail:
+
+
+Threads = 2
+Q3 (Single-thread total): 1,709,584 ns
+  • Low: 25,042 ns, Lower middle: 24,542 ns, Upper middle: 23,417 ns,
+High: 23,917 ns
+Q3 (Multi-thread total): 67,917 ns
+  • Low: 47,625 ns, Lower middle: 25,167 ns, Upper middle: 24,083 ns,
+High: 38,458 ns
+
+
+Threads = 4
+Q3 (Single-thread total): 1,464,333 ns
+  • Low: 25,042 ns, Lower middle: 23,792 ns, Upper middle: 23,417 ns, 
+High: 23,542 ns
+Q3 (Multi-thread total): 77,917 ns
+  • Low: 25,041 ns, Lower middle: 53,958 ns, Upper middle: 24,792 ns, 
+High: 23,875 ns
+
+
+Threads = 6
+Q3 (Single-thread total): 589,667 ns
+  • Low: 26,292 ns, Lower middle: 24,250 ns, Upper middle: 24,667 ns, 
+High: 23,750 ns
+Q3 (Multi-thread total): 82,583 ns
+  • Low: 33,334 ns, Lower middle: 25,375 ns, Upper middle: 24,292 ns,
+High: 24,208 ns
+  *Notes on units: Q3 timings are reported in nanoseconds (ns).
+
+
+The results of the execution times for this query is summarized in the following chart:
+  
+
+
+
+
+
+Query 4
+What is the average population for all countries listed between 1960 and 2023
+
+
+The same method and ideology behind this query follows that of query 2. Using #pragma omp parallel num_threads to specify the number of threads to execute the code block and #pragma omp for to divide work among threads. Here, we also used a row-first traversal since we are summing the entire row starting from a specific index to the end of the row. Since the data access are right next to each other, this was the most efficient way.
+
+
+  
+
+Sample output:
+Average Population of Every Country from 1960 to 2023: 
+---------------------
+"Afghanistan"                   18782444.00
+"Africa Eastern and Southern"                  357969920.00
+"Africa Western and Central"                  243866240.00
+"Albania"                    2713609.00
+"Algeria"                   26222808.00
+"American Samoa"                      42368.00
+"Andorra"                      50480.00
+"Angola"                   15188963.00
+"Antigua and Barbuda"                      72316.00
+"Arab World"                  249670880.00
+"Argentina"                   33202796.00
+"Armenia"                    2927305.00
+"Aruba"                      77906.00
+"Australia"                   17631488.00
+"Austria"                    7917847.00
+"Azerbaijan"                    7246785.00
+"Bahamas                     272015.00
+"Bahrain"                     677471.00
+"Bangladesh"                  110502816.00
+"Barbados"                     259619.00
+"Belarus"                    9511239.00
+"Belgium"                   10239946.00
+"Belize"                     217794.00
+"Benin"                    6333795.00
+"Bermuda"                      58366.00
+"Bhutan"                     519540.00
+"Bolivia"                    7567470.00
+"Bosnia and Herzegovina"                    3895418.00
+"Botswana"                    1427281.00
+"Brazil"                  150663712.00
+"British Virgin Islands"                      17798.00
+"Brunei Darussalam"                     271529.00
+"Bulgaria"                    8093770.00
+"Burkina Faso"                   11021612.00
+"Burundi"                    6321279.00
+"Cabo Verde"                     400372.00
+"Cambodia"                   10251990.00
+"Cameroon"                   13530657.00
+"Canada"                   28226290.00
+"Caribbean small states"                    2483377.00
+"Cayman Islands"                      32717.00
+"Central African Republic"                    3298674.00
+"Central Europe and the Baltics"                  104119728.00
+"Chad"                    7797086.00
+"Channel Islands"                     140184.00
+"Chile"                   13717895.00
+"China"                 1109125376.00
+"Colombia"                   33668812.00
+"Comoros"                     466433.00
+"Congo                   42955488.00
+"Congo                    2805107.00
+"Costa Rica"                    3304390.00
+"Cote d'Ivoire"                   13809933.00
+"Croatia"                    4398162.00
+"Cuba"                   10224931.00
+"Curacao"                     145288.00
+"Cyprus"                     868258.00
+"Czechia"                   10237331.00
+"Denmark"                    5246286.00
+"Djibouti"                     567597.00
+"Dominica"                      69151.00
+"Dominican Republic"                    7329601.00
+"Early-demographic dividend"                 2149457664.00
+"East Asia & Pacific (IDA & IBRD countries)"                 1566170496.00
+"East Asia & Pacific (excluding high income)"                 1586529152.00
+"East Asia & Pacific"                 1798062720.00
+"Ecuador"                   10911625.00
+"Egypt                   60876696.00
+"El Salvador"                    5075701.00
+"Equatorial Guinea"                     678223.00
+"Eritrea"                    2206267.00
+"Estonia"                    1392234.00
+"Eswatini"                     815530.00
+"Ethiopia"                   59303048.00
+"Euro area"                  316476608.00
+"Europe & Central Asia (IDA & IBRD countries)"                  407777824.00
+"Europe & Central Asia (excluding high income)"                  197900464.00
+"Europe & Central Asia"                  824956992.00
+"European Union"                  416246080.00
+"Faroe Islands"                      44548.00
+"Fiji"                     734598.00
+"Finland"                    5020539.00
+"Fragile and conflict affected situations"                  551881984.00
+"France"                   58527400.00
+"French Polynesia"                     208108.00
+"Gabon"                    1178783.00
+"Gambia                    1217143.00
+"Georgia"                    4152434.00
+"Germany"                   79807688.00
+"Ghana"                   17599744.00
+"Gibraltar"                      28406.00
+"Greece"                   10019931.00
+"Greenland"                      51793.00
+"Grenada"                     105445.00
+"Guam"                     132636.00
+"Guatemala"                    9983785.00
+"Guinea"                    7389353.00
+"Guinea-Bissau"                    1127279.00
+"Guyana"                     740965.00
+"Haiti"                    7379137.00
+"Heavily indebted poor countries (HIPC)"                  429942816.00
+"High income"                 1184339328.00
+"Honduras"                    5700087.00
+"Hong Kong SAR                    5587860.00
+"Hungary"                   10229459.00
+"IBRD only"                 3482356224.00
+"IDA & IBRD total"                 4463583744.00
+"IDA blend"                  321831072.00
+"IDA only"                  659396544.00
+"IDA total"                  981227584.00
+"Iceland"                     264904.00
+"India"                  916069248.00
+"Indonesia"                  185108592.00
+"Iran                   53276856.00
+"Iraq"                   21534702.00
+"Ireland"                    3759066.00
+"Isle of Man"                      69264.00
+"Israel"                    5396000.00
+"Italy"                   56572524.00
+"Jamaica"                    2354260.00
+"Japan"                  118512304.00
+"Jordan"                    4545948.00
+"Kazakhstan"                   14900428.00
+"Kenya"                   26815428.00
+"Kiribati"                      82000.00
+"Korea                   41097660.00
+"Korea                   19974208.00
+"Kosovo"                    1664838.00
+"Kuwait"                    2012901.00
+"Kyrgyz Republic"                    4394579.00
+"Lao PDR"                    4602440.00
+"Late-demographic dividend"                 1809468800.00
+"Latin America & Caribbean (excluding high income)"                  403407232.00
+"Latin America & Caribbean"                  449404640.00
+"Latin America & the Caribbean (IDA & IBRD countries)"                  435174560.00
+"Latvia"                    2309606.00
+"Least developed countries: UN classification"                  590010496.00
+"Lebanon"                    3842608.00
+"Lesotho"                    1652661.00
+"Liberia"                    2714354.00
+"Libya"                    4206867.00
+"Liechtenstein"                      29032.00
+"Lithuania"                    3248694.00
+"Low & middle income"                 4244089088.00
+"Low income"                  347041056.00
+"Lower middle income"                 1829613056.00
+"Luxembourg"                     428445.00
+"Macao SAR                     379664.00
+"Madagascar"                   14394816.00
+"Malawi"                   10091686.00
+"Malaysia"                   19575884.00
+"Maldives"                     255633.00
+"Mali"                   10960674.00
+"Malta"                     373773.00
+"Marshall Islands"                      39758.00
+"Mauritania"                    2352070.00
+"Mauritius"                    1054108.00
+"Mexico"                   84063560.00
+"Micronesia                      88161.00
+"Middle East & North Africa (IDA & IBRD countries)"                  240807344.00
+"Middle East & North Africa (excluding high income)"                  242671472.00
+"Middle East & North Africa"                  275525376.00
+"Middle income"                 3897048064.00
+"Moldova"                    2712915.00
+"Monaco"                      29831.00
+"Mongolia"                    2132368.00
+"Montenegro"                     584306.00
+"Morocco"                   24753180.00
+"Mozambique"                   16298047.00
+"Myanmar"                   39610476.00
+"Namibia"                    1472301.00
+"Nauru"                       9005.00
+"Nepal"                   20331036.00
+"Netherlands"                   14988403.00
+"New Caledonia"                     182253.00
+"New Zealand"                    3627485.00
+"Nicaragua"                    4329642.00
+"Niger"                   10935714.00
+"Nigeria"                  110784104.00
+"North America"                  287019520.00
+"North Macedonia"                    1867646.00
+"Northern Mariana Islands"                      39241.00
+"Norway"                    4397847.00
+"Not classified"                          0.00
+"OECD members"                 1116668416.00
+"Oman"                    2053430.00
+"Other small states"                    9566879.00
+"Pacific island small states"                    1788181.00
+"Pakistan"                  128455912.00
+"Palau"                      15327.00
+"Panama"                    2629503.00
+"Papua New Guinea"                    4990781.00
+"Paraguay"                    4238454.00
+"Peru"                   22323222.00
+"Philippines"                   67347064.00
+"Poland"                   36184592.00
+"Portugal"                    9845269.00
+"Post-demographic dividend"                  965720576.00
+"Pre-demographic dividend"                  501764256.00
+"Puerto Rico"                    3297588.00
+"Qatar"                     855703.00
+"Romania"                   21024190.00
+"Russian Federation"                  140176640.00
+"Rwanda"                    7383050.00
+"Samoa"                     172193.00
+"San Marino"                      24922.00
+"Sao Tome and Principe"                     131915.00
+"Saudi Arabia"                   18049646.00
+"Senegal"                    8689411.00
+"Serbia"                    7234053.00
+"Seychelles"                      72803.00
+"Sierra Leone"                    4655061.00
+"Singapore"                    3499355.00
+"Sint Maarten (Dutch part)"                      23147.00
+"Slovak Republic"                    5081059.00
+"Slovenia"                    1920626.00
+"Small states"                   13838438.00
+"Solomon Islands"                     368897.00
+"Somalia"                    8157175.00
+"South Africa"                   38946340.00
+"South Asia (IDA & IBRD)"                 1211817472.00
+"South Asia"                 1211817472.00
+"South Sudan"                    6129511.00
+"Spain"                   39757144.00
+"Sri Lanka"                   16900806.00
+"St. Kitts and Nevis"                      45957.00
+"St. Lucia"                     140852.00
+"St. Martin (French part)"                      21381.00
+"St. Vincent and the Grenadines"                     106013.00
+"Sub-Saharan Africa (IDA & IBRD countries)"                  601836160.00
+"Sub-Saharan Africa (excluding high income)"                  601763392.00
+"Sub-Saharan Africa"                  601836160.00
+"Sudan"                   23609784.00
+"Suriname"                     446797.00
+"Sweden"                    8753814.00
+"Switzerland"                    6976948.00
+"Syrian Arab Republic"                   13340827.00
+"Tajikistan"                    5574216.00
+"Tanzania"                   30722664.00
+"Thailand"                   53764860.00
+"Timor-Leste"                     825543.00
+"Togo"                    4448328.00
+"Tonga"                      96903.00
+"Trinidad and Tobago"                    1233667.00
+"Tunisia"                    8360605.00
+"Turkiye"                   55852660.00
+"Turkmenistan"                    3884286.00
+"Turks and Caicos Islands"                      17790.00
+"Tuvalu"                       8608.00
+"Uganda"                   21743424.00
+"Ukraine"                   47622068.00
+"United Arab Emirates"                    3434973.00
+"United Kingdom"                   58899424.00
+"United States"                  258734848.00
+"Upper middle income"                 2067435008.00
+"Uruguay"                    3097935.00
+"Uzbekistan"                   21161664.00
+"Vanuatu"                     170927.00
+"Venezuela                   19743776.00
+"Viet Nam"                   67047000.00
+"Virgin Islands (U.S.)"                      93075.00
+"West Bank and Gaza"                    1864126.00
+"World"                 5448623104.00
+"Yemen                   15585851.00
+"Zambia"                    9235383.00
+"Zimbabwe"                    9776680.00
+
+
+Single Thread execution for Average Population 1960-2023: : 1511458ns
+  
+
+Here, the execution times were dialed down to nanoseconds, as when benchmarking with milliseconds, it was returning 1ms on average regardless of thread count. Since the retrieval of the data was efficient with high page density, a thread could calculate the data in each row pretty fast. Increasing the thread count did minimal difference.

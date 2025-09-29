@@ -137,7 +137,6 @@ int main(int argc, char** argv) {
     }
 
 
-/*
     // Q2: In the Month of #, what site yielded the BEST AQI? Note: Lower AQI = better  @John
     cout<< "Single Thread Query 2: In the Month of Aug or Sep, what sites yielded the BEST AQI?" <<endl;
         Facade querySpecific;
@@ -193,7 +192,7 @@ int main(int argc, char** argv) {
         querySpecific.stopTimer();
         string msg6 = "Overall execution for Query 2:";
         querySpecific.printTimeSummary(msg6);
-*/
+
     // Q3: What country codes are in what income level? @Raeeka
         // Low
         // Med
@@ -269,8 +268,6 @@ int main(int argc, char** argv) {
     }
     std::cout << "=== END Q3 per-group timers ===\n";
 
-
-/*
     // Q4: Average population between 1960 - 2023 for all countries @John
     //start from row 5 for start of data
     // 1960 - 2023: col 5 - 68
@@ -285,7 +282,6 @@ int main(int argc, char** argv) {
     string wbMsg = "\nSingle Thread execution for Average Population 1960-2023: ";
     facade2.printTimeSummary(wbMsg);
 
-*/
 
     // -- SINGLE THREAD QUERIES END ---------
 
@@ -486,9 +482,9 @@ int main(int argc, char** argv) {
     std::cout << "=== END Q3 per-group timers (Multi) ===\n";
     // === Q3 (Multi-thread) END ===
     cout<<"Multi Thread Query 4: What is the average population size of each country between 1960-2023?" <<endl;
-    /*facade2.startTimer();
+    facade2.startTimer();
     facade2.getAvgPop(wbData, wbColIdx, dataRowStart, 2);
-    facade2.stopTimer();*/
+    facade2.stopTimer();
     string wbMsgMulti = "Multi Thread execution for Average Population 1960-2023: ";
     facade2.printTimeSummary(wbMsgMulti);
 
