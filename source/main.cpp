@@ -16,7 +16,7 @@ int main(int argc, char** argv) {
     vector<vector<string>> csvFilesData = facade.readCsv(inputPath, 1);
 
     // parse datasets/world_bank directory and store all csv file data in a vector  with thread count of choice
-    // TODO
+    //Population dataset
     Facade facade2;
     string wbPath = "../datasets/world_bank/API_SP.POP.TOTL_DS2_en_csv_v2_3401680.csv";
     vector<vector<string>> wbData = facade2.readCsv(wbPath, 1);
@@ -43,6 +43,7 @@ int main(int argc, char** argv) {
     // -- SINGLE THREAD QUERIES BEGIN---------
 
     //Q1: How many cases of ## reporting have missing Raw Concentration or AQI	@Raeeka
+    cout << "Single Thread Query1: How many cases of Particulants reporting have missing Raw Concentration and AQI?" << endl;
         // PM10
         // PM2.5
         // OZONE
@@ -68,60 +69,61 @@ int main(int argc, char** argv) {
 
 
 
-    // Q2: In the Month of #, what site yielded the BEST and WORST AQI? Note: Lower AQI = better  @John
-        // Facade querySpecific;
-        // querySpecific.startTimer();
+    // Q2: In the Month of #, what site yielded the BEST AQI? Note: Lower AQI = better  @John
+    cout<< "Single Thread Query 2: In the Month of Aug or Sep, what sites yielded the BEST AQI?" <<endl;
+        Facade querySpecific;
+        querySpecific.startTimer();
         // // PM10 in Aug
-        // facade.startTimer();
-        // vector<int> columnIndx = {2, 3, 7}; // utc, param, aqi
-        // vector<string> columnData = {"08", "PM10"};
-        // cout<< "\nTop 10 Sites with the BEST PM10 AQI readings in August: "<< endl;
-        // vector<pair<string,string>> PM10 = facade.getMaxAqiBasedOnParticulantsAndMonth(csvFilesData, columnIndx, columnData, 1);
-        // facade.printResults(PM10, 10);
-        // facade.stopTimer();
-        // string msg1 = "Single Thread execution duration";
-        // facade.printTimeSummary(msg1);
-        // // PM2.5 in Sep
-        // facade.startTimer();
-        // vector<string> columnData2 = {"08", "PM2.5"};
-        // cout<< "\nTop 10 Sites with the BEST PM2.5 AQI readings in August: "<< endl;
-        // vector<pair<string,string>> PM25 = facade.getMaxAqiBasedOnParticulantsAndMonth(csvFilesData, columnIndx, columnData2, 1);
-        // facade.printResults(PM25, 10);
-        // facade.stopTimer();
-        // string msg2 = "Single Thread execution duration";
-        // facade.printTimeSummary(msg2);
+        facade.startTimer();
+        vector<int> columnIndx = {2, 3, 7}; // utc, param, aqi
+        vector<string> columnData = {"08", "PM10"};
+        cout<< "\nTop 10 Sites with the BEST PM10 AQI readings in August: "<< endl;
+        vector<pair<string,string>> PM10 = facade.getMaxAqiBasedOnParticulantsAndMonth(csvFilesData, columnIndx, columnData, 1);
+        facade.printResults(PM10, 10);
+        facade.stopTimer();
+        string msg1 = "Single Thread execution duration";
+        facade.printTimeSummary(msg1);
+        // PM2.5 in Sep
+        facade.startTimer();
+        vector<string> columnData2 = {"09", "PM2.5"};
+        cout<< "\nTop 10 Sites with the BEST PM2.5 AQI readings in September: "<< endl;
+        vector<pair<string,string>> PM25 = facade.getMaxAqiBasedOnParticulantsAndMonth(csvFilesData, columnIndx, columnData2, 1);
+        facade.printResults(PM25, 10);
+        facade.stopTimer();
+        string msg2 = "Single Thread execution duration";
+        facade.printTimeSummary(msg2);
 
-        // // OZONE in Aug
-        // facade.startTimer();
-        // vector<string> columnData3 = {"08", "OZONE"};
-        // cout<< "\nTop 10 Sites with the BEST OZONE AQI readings in August: "<< endl;
-        // vector<pair<string,string>> OZONE = facade.getMaxAqiBasedOnParticulantsAndMonth(csvFilesData, columnIndx, columnData3, 1);
-        // facade.printResults(OZONE, 10);
-        // facade.stopTimer();
-        // string msg3 = "Single Thread execution duration";
-        // facade.printTimeSummary(msg3);
-        // // CO in Sep
-        // facade.startTimer();
-        // vector<string> columnData4 = {"08", "CO"};
-        // cout<< "\nTop 10 Sites with the BEST CO AQI readings in August: "<< endl;
-        // vector<pair<string,string>> CO = facade.getMaxAqiBasedOnParticulantsAndMonth(csvFilesData, columnIndx, columnData4, 1);
-        // facade.printResults(CO, 10);
-        // facade.stopTimer();
-        // string msg4 = "Single Thread execution duration";
-        // facade.printTimeSummary(msg4);
-        // // NO2 in Aug
-        // facade.startTimer();
-        // vector<string> columnData5 = {"08", "NO2"};
-        // cout<< "\nTop 10 Sites with the BEST NO2 AQI readings in August: "<< endl;
-        // vector<pair<string,string>> NO2 = facade.getMaxAqiBasedOnParticulantsAndMonth(csvFilesData, columnIndx, columnData5, 1);
-        // facade.printResults(NO2, 10);
-        // facade.stopTimer();
-        // string msg5 = "Single Thread execution duration";
-        // facade.printTimeSummary(msg5);
+        // OZONE in Aug
+        facade.startTimer();
+        vector<string> columnData3 = {"08", "OZONE"};
+        cout<< "\nTop 10 Sites with the BEST OZONE AQI readings in August: "<< endl;
+        vector<pair<string,string>> OZONE = facade.getMaxAqiBasedOnParticulantsAndMonth(csvFilesData, columnIndx, columnData3, 1);
+        facade.printResults(OZONE, 10);
+        facade.stopTimer();
+        string msg3 = "Single Thread execution duration";
+        facade.printTimeSummary(msg3);
+        // CO in Sep
+        facade.startTimer();
+        vector<string> columnData4 = {"09", "CO"};
+        cout<< "\nTop 10 Sites with the BEST CO AQI readings in September: "<< endl;
+        vector<pair<string,string>> CO = facade.getMaxAqiBasedOnParticulantsAndMonth(csvFilesData, columnIndx, columnData4, 1);
+        facade.printResults(CO, 10);
+        facade.stopTimer();
+        string msg4 = "Single Thread execution duration";
+        facade.printTimeSummary(msg4);
+        // NO2 in Aug
+        facade.startTimer();
+        vector<string> columnData5 = {"08", "NO2"};
+        cout<< "\nTop 10 Sites with the BEST NO2 AQI readings in August: "<< endl;
+        vector<pair<string,string>> NO2 = facade.getMaxAqiBasedOnParticulantsAndMonth(csvFilesData, columnIndx, columnData5, 1);
+        facade.printResults(NO2, 10);
+        facade.stopTimer();
+        string msg5 = "Single Thread execution duration";
+        facade.printTimeSummary(msg5);
 
-        // querySpecific.stopTimer();
-        // string msg6 = "Overall Query execution:";
-        // querySpecific.printTimeSummary(msg6);
+        querySpecific.stopTimer();
+        string msg6 = "Overall execution for Query 2:";
+        querySpecific.printTimeSummary(msg6);
 
     // Q3: What country codes are in what income level? @Raeeka
         // Low
@@ -161,15 +163,16 @@ int main(int argc, char** argv) {
 
 /*
 
-    // Q4: Top 10 countries that grew in population between 1960 - 2023 @John
+    // Q4: Average population between 1960 - 2023 for all countries @John
     //start from row 5 for start of data
     // 1960 - 2023: col 5 - 68
+    cout<<"Single Thread Query 4: What is the average population size of each country between 1960-2023?" <<endl;
     vector<int> wbColIdx = {0, 5, 68 }; // cols: country name, 1960, 1968
     int dataRowStart = 5;
     facade2.startTimer();
     facade2.getAvgPop(wbData, wbColIdx, dataRowStart, 1);
     facade2.stopTimer();
-    string wbMsg = "\nSingle Thread execution: ";
+    string wbMsg = "\nSingle Thread execution for Average Population 1960-2023: ";
     facade2.printTimeSummary(wbMsg);
 
 
@@ -179,6 +182,73 @@ int main(int argc, char** argv) {
 
     // -- MULTI THREAD QUERIES BEGIN ---------
 
+    // Q2: In the Month of #, what site yielded the BEST and WORST AQI? Note: Lower AQI = better  @John
+    cout<<"Multi Thread Query 2: In the Month of Aug or Sep, what sites yielded the BEST AQI?" <<endl;
+    Facade multiFacade;
+    vector<vector<string>> csvDataMulti = multiFacade.readCsv(inputPath, 1);
+    Facade querySpecificMulti;
+    querySpecificMulti.startTimer();
+    // // PM10 in Aug
+    multiFacade.startTimer();
+    vector<int> columnIndxMulti = {2, 3, 7}; // utc, param, aqi
+    vector<string> columnDataMulti = {"08", "PM10"};
+    cout<< "\nTop 10 Sites with the BEST PM10 AQI readings in August: "<< endl;
+    vector<pair<string,string>> PM10Multi = multiFacade.getMaxAqiBasedOnParticulantsAndMonth(csvDataMulti, columnIndxMulti, columnDataMulti, 2);
+    multiFacade.printResults(PM10Multi, 10);
+    multiFacade.stopTimer();
+    string msg1Multi = "Multi Thread execution duration";
+    multiFacade.printTimeSummary(msg1Multi);
+    // PM2.5 in Sep
+    multiFacade.startTimer();
+    vector<string> columnData2Multi = {"09", "PM2.5"};
+    cout<< "\nTop 10 Sites with the BEST PM2.5 AQI readings in September: "<< endl;
+    vector<pair<string,string>> PM25Multi = multiFacade.getMaxAqiBasedOnParticulantsAndMonth(csvDataMulti, columnIndxMulti, columnData2Multi, 2);
+    multiFacade.printResults(PM25Multi, 10);
+    multiFacade.stopTimer();
+    string msg2Multi = "Multi Thread execution duration";
+    multiFacade.printTimeSummary(msg2Multi);
+
+    // OZONE in Aug
+    multiFacade.startTimer();
+    vector<string> columnData3Multi = {"08", "OZONE"};
+    cout<< "\nTop 10 Sites with the BEST OZONE AQI readings in August: "<< endl;
+    vector<pair<string,string>> OZONEMulti = multiFacade.getMaxAqiBasedOnParticulantsAndMonth(csvDataMulti, columnIndxMulti, columnData3Multi, 2);
+    multiFacade.printResults(OZONEMulti, 10);
+    multiFacade.stopTimer();
+    string msg3Multi = "Multi Thread execution duration";
+    multiFacade.printTimeSummary(msg3Multi);
+    // CO in Sep
+    multiFacade.startTimer();
+    vector<string> columnData4Multi = {"09", "CO"};
+    cout<< "\nTop 10 Sites with the BEST CO AQI readings in September: "<< endl;
+    vector<pair<string,string>> COMulti = multiFacade.getMaxAqiBasedOnParticulantsAndMonth(csvDataMulti, columnIndxMulti, columnData4Multi, 2);
+    multiFacade.printResults(COMulti, 10);
+    multiFacade.stopTimer();
+    string msg4Multi = "Multi Thread execution duration";
+    multiFacade.printTimeSummary(msg4Multi);
+    // NO2 in Aug
+    multiFacade.startTimer();
+    vector<string> columnData5Multi = {"08", "NO2"};
+    cout<< "\nTop 10 Sites with the BEST NO2 AQI readings in August: "<< endl;
+    vector<pair<string,string>> NO2Multi = multiFacade.getMaxAqiBasedOnParticulantsAndMonth(csvDataMulti, columnIndxMulti, columnData5Multi, 2);
+    multiFacade.printResults(NO2Multi, 10);
+    multiFacade.stopTimer();
+    string msg5Multi = "Multi Thread execution duration";
+    multiFacade.printTimeSummary(msg5Multi);
+
+    querySpecificMulti.stopTimer();
+    string msg6Multi = "Overall execution for Query 2 with Multi Threading:";
+    querySpecificMulti.printTimeSummary(msg6Multi);
+
+    // Q4: Average population between 1960 - 2023 for all countries @John
+    //start from row 5 for start of data
+    // 1960 - 2023: col 5 - 68
+    cout<<"Multi Thread Query 4: What is the average population size of each country between 1960-2023?" <<endl;
+    facade2.startTimer();
+    facade2.getAvgPop(wbData, wbColIdx, dataRowStart, 2);
+    facade2.stopTimer();
+    string wbMsgMulti = "Multi Thread execution for Average Population 1960-2023: ";
+    facade2.printTimeSummary(wbMsgMulti);
 
     // -- MULTI THREAD QUERIES END   ---------
 

@@ -60,11 +60,11 @@ vector<pair<string,string>> Facade::getMaxAqiBasedOnParticulantsAndMonth(vector<
     vector<vector<string>> aqiData;
     vector<pair<string,string>> sites;
 
-    //iterate through data based on column index and take row that matches columnData conditions into consideration to crunch data
-    #pragma omp parallel num_threads(num_threads)
+    //iterate through rows of data based on column index and take row that matches columnData conditions into consideration to crunch data
+    #pragma omp parallel num_threads(num_threads) // establishes how many threads will run this section
     {
         vector<vector<string>> individualThreadStorage; //give a thread it's own storage to avoid race conditions
-        #pragma omp for
+        #pragma omp for // divide work among num_threads threads
         for(int i = 0; i < dataset.size(); ++i){
             const auto& row = dataset[i];
             // cout << row[columnIndex[0]].substr(6,2)<< "==" << columnData[0] << endl;
@@ -83,7 +83,7 @@ vector<pair<string,string>> Facade::getMaxAqiBasedOnParticulantsAndMonth(vector<
         // cout << "storing" << endl;
         aqiData.insert(aqiData.end(), individualThreadStorage.begin(), individualThreadStorage.end());
         // cout<< aqiData.size() <<endl;
-        individualThreadStorage.clear();
+        #pragma omp barrier // lets threads finish the first half first. Fully write to aqiData before moving onto the next part to prevent race conditions
 
         vector<pair<string,string>> individualThreadStorage2; //redeclare local storage but only as a 1D array
         
@@ -106,11 +106,10 @@ vector<pair<string,string>> Facade::getMaxAqiBasedOnParticulantsAndMonth(vector<
         }
         #pragma omp critical
         sites.insert(sites.end(), individualThreadStorage2.begin(), individualThreadStorage2.end());
-
-        set<pair<string,string>> uniqueSites(sites.begin(), sites.end());
-        sites.assign(uniqueSites.begin(), uniqueSites.end());
-
     }
+    //once threads have saved to sites, sort site to remove any duplicate rows.
+    set<pair<string,string>> uniqueSites(sites.begin(), sites.end());
+    sites.assign(uniqueSites.begin(), uniqueSites.end());
 
     return sites;
 };
